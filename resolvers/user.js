@@ -1,10 +1,33 @@
+import passwordHash from 'password-hash';
+import utils from '../util/util';
+
 export default {
   Query: {
-    getUser: (parent, { id }, { models }) =>
-      models.User.findOne({ where: { id } }),
-    allUsers: (parent, args, { models }) => models.User.findAll()
+    getUser: (parent, { id }, { models }) => models.User.findOne({ where: { id } }),
+    allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {
-    createUser: (parent, args, { models }) => models.User.create(args)
-  }
+    registerUser: async (parent, {...args, password}, { models }) => {
+      try {
+        if(!(password.length > 5 && password.length < 21)) {
+          return {
+            success: false,
+            errors: [{field: 'password', message: 'Password must be 6 - 20 Characters in length'}]
+          }
+        }
+        const hashedPassword = passwordHash.generate(password);
+        const user = await models.User.create({...args, password: hashedPassword})
+        return {
+          success: true,
+          user
+        }
+      } catch (err) {
+        console.error("Error occured while registering User", err);
+        return {
+          success: false,
+          errors: utils.generateErrorModel(err, models) 
+        };
+      }
+    }
+  },
 };
