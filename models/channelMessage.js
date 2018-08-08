@@ -1,13 +1,7 @@
 export default (sequelize, DataTypes) => {
-  const ChannelMessage = sequelize.define(
-    "channel_message",
-    {
-      message: DataTypes.STRING
-    },
-    {
-      underscored: true
-    }
-  );
+  const ChannelMessage = sequelize.define("channel_message", {
+    message: DataTypes.STRING
+  });
 
   ChannelMessage.associate = models => {
     ChannelMessage.belongsTo(models.Channel, {

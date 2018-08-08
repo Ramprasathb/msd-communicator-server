@@ -6,7 +6,10 @@ const sequelize = new Sequelize(
   properties.DB_USERNAME,
   properties.DB_PASSWORD,
   {
-    dialect: "postgres"
+    dialect: "postgres",
+    define: {
+      underscored: true
+    }
   }
 );
 
