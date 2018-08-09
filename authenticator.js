@@ -5,7 +5,7 @@ import passwordHash from 'password-hash';
 export const createTokens = async (user, secret, refreshSecret) => {
   const createToken = jwt.sign(
     {
-      user: _.pick(user, ['id', 'email']),
+      user: _.pick(user, 'id'),
     },
     secret,
     {
@@ -27,7 +27,7 @@ export const createTokens = async (user, secret, refreshSecret) => {
   return [createToken, createRefreshToken];
 };
 
-export const refreshTokens = async (token, refreshToken, models, SECRET) => {
+export const refreshTokens = async (token, refreshToken, models, SECRET, REFRESH_SECRET) => {
   let userId = -1;
   try {
     const {
@@ -48,13 +48,15 @@ export const refreshTokens = async (token, refreshToken, models, SECRET) => {
     return {};
   }
 
+  const refreshTokenSecret = user.password + REFRESH_SECRET;
+
   try {
-    jwt.verify(refreshToken, user.refreshSecret);
+    jwt.verify(refreshToken, refreshTokenSecret);
   } catch (err) {
     return {};
   }
 
-  const [newToken, newRefreshToken] = await createTokens(user, SECRET, user.refreshSecret);
+  const [newToken, newRefreshToken] = await createTokens(user, SECRET, refreshTokenSecret);
   return {
     token: newToken,
     refreshToken: newRefreshToken,

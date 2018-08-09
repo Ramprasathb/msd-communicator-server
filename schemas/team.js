@@ -1,5 +1,6 @@
 export default `
     type Team {
+        name: String!
         owner: User!
         members: [User!]!
         channels: [Channel!]!
@@ -9,7 +10,12 @@ export default `
         getTeam(name: String!): Team
     }
 
+    type CreateTeamResponse {
+        success: Boolean!
+        errors: [Error!]
+    }
+
     type Mutation {
-        createTeam(name: String!): Boolean!
+        createTeam(name: String!): CreateTeamResponse!
     }
 `;

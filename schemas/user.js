@@ -3,7 +3,7 @@ export default `
         id: Int!
         username: String!
         email: String!
-        teams: [Team!]!
+        teams: [Team!]
     }
 
     type Query {
