@@ -1,5 +1,6 @@
 import passwordHash from 'password-hash';
 import utils from '../util/util';
+import { authenticateLogin } from '../authenticator';
 
 export default {
   Query: {
@@ -9,10 +10,10 @@ export default {
   Mutation: {
     registerUser: async (parent, {...args, password}, { models }) => {
       try {
-        if(!(password.length > 5 && password.length < 21)) {
+        if(!(password.length > 5 && password.length < 51)) {
           return {
             success: false,
-            errors: [{field: 'password', message: 'Password must be 6 - 20 Characters in length'}]
+            errors: [{field: 'password', message: 'Password must be 6 - 50 Characters in length'}]
           }
         }
         const hashedPassword = passwordHash.generate(password);
@@ -28,6 +29,7 @@ export default {
           errors: utils.generateErrorModel(err, models) 
         };
       }
-    }
+    },
+    loginUser: ( parent, {email, password}, { models, SECRET, REFRESH_SECRET }) => authenticateLogin(email, password, models, SECRET, REFRESH_SECRET),
   },
 };

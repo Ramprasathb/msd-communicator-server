@@ -9,8 +9,8 @@ export default (sequelize, DataTypes) => {
           msg: 'Username has to be alphanumeric',
         },
         len: {
-          args: [2, 20],
-          msg: 'Username has to be 2-20 characters in length',
+          args: [2, 100],
+          msg: 'Username has to be 2-100 characters in length',
         },
       },
     },
@@ -23,7 +23,9 @@ export default (sequelize, DataTypes) => {
           msg: 'e-mail address is invalid',
         },
       },
-      password: DataTypes.STRING,
+    },
+    password: {
+      type: DataTypes.STRING,
     },
   });
 
