@@ -1,27 +1,28 @@
-import Sequelize from "sequelize";
-import properties from "../config/properties";
+import Sequelize from 'sequelize';
+import properties from '../config/properties';
 
 const sequelize = new Sequelize(
   properties.DB_SCHEMA,
   properties.DB_USERNAME,
   properties.DB_PASSWORD,
   {
-    dialect: "postgres",
+    dialect: 'postgres',
     define: {
-      underscored: true
-    }
-  }
+      underscored: true,
+    },
+    operatorsAliases: Sequelize.Op,
+  },
 );
 
 const models = {
-  User: sequelize.import("./user"),
-  Team: sequelize.import("./team"),
-  Channel: sequelize.import("./channel"),
-  ChannelMessage: sequelize.import("./channelMessage")
+  User: sequelize.import('./user'),
+  Team: sequelize.import('./team'),
+  Channel: sequelize.import('./channel'),
+  ChannelMessage: sequelize.import('./channelMessage'),
 };
 
-Object.keys(models).forEach(modelName => {
-  if ("associate" in models[modelName]) {
+Object.keys(models).forEach((modelName) => {
+  if ('associate' in models[modelName]) {
     models[modelName].associate(models);
   }
 });

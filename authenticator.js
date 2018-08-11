@@ -5,7 +5,7 @@ import passwordHash from 'password-hash';
 export const createTokens = async (user, secret, refreshSecret) => {
   const createToken = jwt.sign(
     {
-      user: _.pick(user, 'id'),
+      user: _.pick(user, ['id', 'username']),
     },
     secret,
     {
@@ -101,7 +101,7 @@ export const authenticateLogin = async (email, password, models, SECRET, REFRESH
   }
 };
 
-const verifyAuthentication  = (authVerifier) => {
+const verifyAuthentication = (authVerifier) => {
   const basicAuthVerifier = authVerifier;
   basicAuthVerifier.verifyAuthentication = (additionalAuthVerifier) => {
     const tempAuthVerifier = async (parent, args, context) => {

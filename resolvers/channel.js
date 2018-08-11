@@ -1,13 +1,22 @@
+import utils from '../util/util';
+import { requiresUserLogin } from '../authenticator';
+
 export default {
   Mutation: {
-    createChannel: (parent, args, { models }) => {
+    createChannel: requiresUserLogin.verifyAuthentication(async (parent, args, { models }) => {
       try {
-        models.Channel.create(args);
-        return true;
+        const channel = await models.Channel.create(args);
+        return {
+          success: true,
+          channel,
+        };
       } catch (err) {
-        console.error("Error occurred while creating Channel");
-        return false; 
+        console.error('Error occurred while creating Channel');
+        return {
+          success: false,
+          errors: utils.generateErrorModel(err, models),
+        };
       }
-    }
-  }
+    }),
+  },
 };
