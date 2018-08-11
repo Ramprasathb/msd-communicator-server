@@ -21,6 +21,7 @@ export const createTokens = async (user, secret, refreshSecret) => {
     refreshSecret,
     {
       expiresIn: '7d',
+      issuer: 'msd',
     },
   );
 
@@ -99,3 +100,21 @@ export const authenticateLogin = async (email, password, models, SECRET, REFRESH
     };
   }
 };
+
+const verifyAuthentication  = (authVerifier) => {
+  const basicAuthVerifier = authVerifier;
+  basicAuthVerifier.verifyAuthentication = (additionalAuthVerifier) => {
+    const tempAuthVerifier = async (parent, args, context) => {
+      await authVerifier(parent, args, context);
+      return additionalAuthVerifier(parent, args, context);
+    };
+    return verifyAuthentication(tempAuthVerifier);
+  };
+  return authVerifier;
+};
+
+export const requiresUserLogin = verifyAuthentication((parent, args, { user }) => {
+  if (!user || !user.id) {
+    throw new Error('User has to be logged in!');
+  }
+});

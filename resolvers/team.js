@@ -1,10 +1,11 @@
 import utils from '../util/util';
+import { requiresUserLogin } from '../authenticator';
 
 export default {
   Mutation: {
-    createTeam: (parent, args, { models, user }) => {
+    createTeam: requiresUserLogin.verifyAuthentication(async (parent, args, { models, user }) => {
       try {
-        models.Team.create({ ...args, owner: user.id });
+        await models.Team.create({ ...args, owner: user.id });
         return {
           success: true,
         };
@@ -15,6 +16,6 @@ export default {
           errors: utils.generateErrorModel(err, models),
         };
       }
-    },
+    }),
   },
 };

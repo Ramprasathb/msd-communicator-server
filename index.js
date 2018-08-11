@@ -35,7 +35,7 @@ const authenticateUserMiddleware = async (request, response, next) => {
   const token = request.headers.token;
   if (token) {
     try {
-      const user = jwt.verify(token, SECRET);
+      const { user } = jwt.verify(token, SECRET);
       console.log('User is logged in');
       request.user = user;
     } catch (err) {
