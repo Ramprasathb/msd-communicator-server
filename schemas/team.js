@@ -2,14 +2,15 @@ export default `
     type Team {
         id: Int!
         name: String!
-        owner: User!
+        owner: Int!
         members: [User!]!
         channels: [Channel!]
     }
 
     type Query {
         getTeam(name: String!): Team
-        allTeams: [Team!]
+        ownedTeams: [Team!]
+        memberOfTeams: [Team!]
     }
 
     type CreateTeamResponse {
@@ -18,7 +19,13 @@ export default `
         errors: [Error!]
     }
 
+    type PlainResponse {
+        success: Boolean!
+        errors: [Error!]
+    }
+
     type Mutation {
-        createTeam(name: String!): CreateTeamResponse!
+        createTeam(name: String!): CreateTeamResponse!,
+        addUserToTeam(email: String!, teamId: Int!) : PlainResponse!
     }
 `;
