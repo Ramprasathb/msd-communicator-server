@@ -8,28 +8,30 @@ export default {
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {
-    registerUser: async (parent, {...args, password}, { models }) => {
+    registerUser: async (parent, { ...args, password }, { models }) => {
       try {
-        if(!(password.length > 5 && password.length < 51)) {
+        if (!(password.length > 5 && password.length < 51)) {
           return {
             success: false,
-            errors: [{field: 'password', message: 'Password must be 6 - 50 Characters in length'}]
-          }
+            errors: [{ field: 'password', message: 'Password must be 6 - 50 Characters in length' }],
+          };
         }
         const hashedPassword = passwordHash.generate(password);
-        const user = await models.User.create({...args, password: hashedPassword})
+        const user = await models.User.create({ ...args, password: hashedPassword });
         return {
           success: true,
-          user
-        }
+          user,
+        };
       } catch (err) {
-        console.error("Error occured while registering User", err);
+        console.log('Error occured while registering User', err);
         return {
           success: false,
-          errors: utils.generateErrorModel(err, models) 
+          errors: utils.generateErrorModel(err, models),
         };
       }
     },
-    loginUser: ( parent, {email, password}, { models, SECRET, REFRESH_SECRET }) => authenticateLogin(email, password, models, SECRET, REFRESH_SECRET),
+    loginUser: (parent, { email, password }, { models, SECRET, REFRESH_SECRET }) => (
+      authenticateLogin(email, password, models, SECRET, REFRESH_SECRET)
+    ),
   },
 };

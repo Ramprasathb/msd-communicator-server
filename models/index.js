@@ -19,6 +19,7 @@ const models = {
   Team: sequelize.import('./team'),
   Channel: sequelize.import('./channel'),
   ChannelMessage: sequelize.import('./channelMessage'),
+  DirectMessage: sequelize.import('./directMessage'),
   Member: sequelize.import('./member'),
 };
 

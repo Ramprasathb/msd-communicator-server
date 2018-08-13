@@ -4,7 +4,7 @@ import path from 'path';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
-
+import { execute, subscribe } from 'graphql';
 import properties from './config/properties';
 import models from './models';
 import { refreshTokens } from './authenticator';
@@ -19,6 +19,8 @@ const appServer = new ApolloServer({
   typeDefs,
   resolvers,
   subscriptions: {
+    execute,
+    subscribe,
     onConnect: async ({ token, refreshToken }, webSocket) => {
       if (token && refreshToken) {
         console.log('_--------- TOken and Ref Token are set');

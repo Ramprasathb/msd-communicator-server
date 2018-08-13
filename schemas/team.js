@@ -5,12 +5,14 @@ export default `
         owner: Int!
         members: [User!]!
         channels: [Channel!]
+        directMessageMembers: [User!]!
     }
 
     type Query {
         getTeam(name: String!): Team
         ownedTeams: [Team!]
         memberOfTeams: [Team!]
+        getTeamMembers(teamId: Int!): [User!]!
     }
 
     type CreateTeamResponse {

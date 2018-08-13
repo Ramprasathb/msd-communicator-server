@@ -1,4 +1,3 @@
-
 import utils from '../util/util';
 import { requiresUserLogin } from '../authenticator';
 
@@ -10,10 +9,11 @@ export default {
           const team = await models.Team.create({ ...args, owner: user.id });
           await models.Channel.create({ name: 'general', teamId: team.id, public: true });
           await models.Channel.create({ name: 'random', teamId: team.id, public: true });
+          return team;
         });
         return {
           success: true,
-          teamCreationResponse,
+          team: teamCreationResponse.dataValues,
         };
       } catch (err) {
         console.error('Error Occurred while creating team');
@@ -72,8 +72,24 @@ export default {
         { raw: true },
       );
     }),
+    getTeamMembers: requiresUserLogin.verifyAuthentication(async (parent, { teamId }, { models }) => models.sequelize.query(
+      'select * from users as u join members as m on m.user_id = u.id where m.team_id = ?',
+      {
+        replacements: [teamId],
+        model: models.User,
+        raw: true,
+      },
+    )),
   },
   Team: {
     channels: ({ id }, args, { models }) => models.Channel.findAll({ where: { teamId: id } }),
+    directMessageMembers: ({ id }, args, { models, user }) => models.sequelize.query(
+      'select distinct on (u.id) u.id, u.username from users as u join direct_messages as dm on (u.id = dm.sender_id) or (u.id = dm.receiver_id) where (:currentUserId = dm.sender_id or :currentUserId = dm.receiver_id) and dm.team_id = :teamId',
+      {
+        replacements: { currentUserId: user.id, teamId: id },
+        model: models.User,
+        raw: true,
+      },
+    ),
   },
 };

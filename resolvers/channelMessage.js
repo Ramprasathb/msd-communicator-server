@@ -2,20 +2,22 @@ import { PubSub, withFilter } from 'graphql-subscriptions';
 import { requiresUserLogin } from '../authenticator';
 
 const pubsub = new PubSub();
-
 const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
 
 export default {
   Subscription: {
     newChannelMessage: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+        () => {
+          console.log(pubsub, '8**&&^**');
+          return pubsub.asyncIterator(NEW_CHANNEL_MESSAGE);
+        },
         (payload, args) => payload.channelId === args.channelId,
       ),
     },
   },
   ChannelMessage: {
-    member: ({ user, userId }, args, { models }) => {
+    user: ({ user, userId }, args, { models }) => {
       if (user) {
         return user;
       }
