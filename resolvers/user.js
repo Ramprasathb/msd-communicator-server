@@ -4,7 +4,7 @@ import { authenticateLogin } from '../authenticator';
 
 export default {
   Query: {
-    getUser: (parent, { id }, { models }) => models.User.findOne({ where: { id } }),
+    getUser: (parent, { userId }, { models }) => models.User.findOne({ where: { id: userId } }),
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {
