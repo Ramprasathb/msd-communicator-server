@@ -5,6 +5,7 @@ export default `
         user: User!
         channel: Channel!
         created_at: String!
+        reply: [ChannelMessageThread!]
     }
 
     type Mutation {
@@ -16,6 +17,6 @@ export default `
     }
 
     type Subscription {
-        newChannelMessage(channelId: Int!): ChannelMessage!
+        newChannelMessage(channelId: Int!): Int!
     }
 `;

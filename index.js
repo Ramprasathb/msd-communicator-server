@@ -23,10 +23,10 @@ const appServer = new ApolloServer({
     subscribe,
     onConnect: async ({ token, refreshToken }, webSocket) => {
       if (token && refreshToken) {
-        console.log('_--------- TOken and Ref Token are set');
         let user = null;
         try {
           const payload = jwt.verify(token, SECRET);
+          // eslint-disable-next-line
           user = payload.user;
         } catch (err) {
           const newTokens = await refreshTokens(
@@ -36,16 +36,16 @@ const appServer = new ApolloServer({
             SECRET,
             REFRESH_SECRET,
           );
+          // eslint-disable-next-line
           user = newTokens.user;
         }
         if (!user) {
-          throw new Error('Invalid auth tokens');
+          // throw new Error('Invalid auth tokens');
         }
-
         return true;
       }
 
-      throw new Error('Missing auth tokens!');
+      // throw new Error('Missing auth tokens!');
     },
     path: '/subscriptions',
   },
@@ -60,6 +60,10 @@ const appServer = new ApolloServer({
     settings: {
       'editor.theme': 'dark',
     },
+  },
+  formatError: (err) => {
+    console.log('############', err);
+    return err;
   },
 });
 

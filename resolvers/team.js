@@ -33,7 +33,7 @@ export default {
             addedUserLoadingPromise,
           ]);
 
-          if (team.owner != user.id) {
+          if (team.owner !== user.id) {
             return {
               success: false,
               errors: [

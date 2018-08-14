@@ -8,10 +8,7 @@ export default {
   Subscription: {
     newChannelMessage: {
       subscribe: withFilter(
-        () => {
-          console.log(pubsub, '8**&&^**');
-          return pubsub.asyncIterator(NEW_CHANNEL_MESSAGE);
-        },
+        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
         (payload, args) => payload.channelId === args.channelId,
       ),
     },
@@ -27,6 +24,20 @@ export default {
         },
         { raw: true },
       );
+    },
+    reply: ({ id, reply }, args, { models }) => {
+      if (reply) {
+        return reply;
+      }
+      return models.ChannelMessageThread.findAll({ where: { messageId: id } });
+    },
+  },
+  ChannelMessageThread: {
+    sender: ({ sender, senderId }, args, { models }) => {
+      if (sender) {
+        return sender;
+      }
+      return models.User.findOne({ where: { id: senderId } }, { raw: true });
     },
   },
   Query: {
@@ -58,7 +69,6 @@ export default {
             });
           };
           asyncFunc();
-
           return {
             success: true,
             message,
@@ -69,6 +79,20 @@ export default {
             success: false,
             errors: [{ field: 'message', message: 'Unable to send message' }],
           };
+        }
+      },
+    ),
+    createChannelMessageThread: requiresUserLogin.verifyAuthentication(
+      async (parent, args, { models, user }) => {
+        try {
+          await models.ChannelMessageThread.create({
+            ...args,
+            senderId: user.id,
+          });
+          return true;
+        } catch (err) {
+          console.log(err);
+          return false;
         }
       },
     ),

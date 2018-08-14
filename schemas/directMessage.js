@@ -5,6 +5,7 @@ export default `
     sender: User!
     receiverId: Int!
     created_at: String!
+    reply: [DirectMessageThread!]
   }
   type Query {
     getDirectMessages(teamId: Int!, receiverId: Int!): [DirectMessage!]!
