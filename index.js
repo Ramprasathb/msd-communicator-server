@@ -28,6 +28,7 @@ const appServer = new ApolloServer({
           const payload = jwt.verify(token, SECRET);
           // eslint-disable-next-line
           user = payload.user;
+          return { user, models };
         } catch (err) {
           const newTokens = await refreshTokens(
             token,
@@ -38,14 +39,10 @@ const appServer = new ApolloServer({
           );
           // eslint-disable-next-line
           user = newTokens.user;
+          return { user, models };
         }
-        if (!user) {
-          throw new Error('Invalid auth tokens');
-        }
-        return true;
       }
-
-      throw new Error('Missing auth tokens!');
+      return { models };
     },
     path: '/subscriptions',
   },
@@ -58,7 +55,6 @@ const appServer = new ApolloServer({
         REFRESH_SECRET,
       };
     }
-    console.log(JSON.stringify(obj));
     return { models };
   },
   playground: {

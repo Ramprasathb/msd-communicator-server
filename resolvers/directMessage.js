@@ -9,9 +9,14 @@ export default {
     newDirectMessage: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(NEW_DIRECT_MESSAGE),
-        (payload, args, { user }) => payload.teamId === args.teamId
-          && ((payload.senderId === user.id && payload.receiverId === args.userId)
-            || (payload.senderId === args.userId && payload.receiverId === user.id)),
+        (payload, args, { user }) => {
+          console.log(payload, args, user);
+          return (
+            payload.teamId === args.teamId
+            && ((payload.senderId === args.senderId && payload.receiverId === args.userId)
+              || (payload.senderId === args.userId && payload.receiverId === args.senderId))
+          );
+        },
       ),
     },
   },
@@ -95,22 +100,19 @@ export default {
             ...args,
             senderId: user.id,
           });
-          const asyncFunc = async () => {
-            const currentUser = await models.User.findOne({
-              where: {
-                id: user.id,
+
+          pubsub.publish(NEW_DIRECT_MESSAGE, {
+            teamId: args.teamId,
+            senderId: user.id,
+            receiverId: args.receiverId,
+            newDirectMessage: {
+              ...message.dataValues,
+              sender: {
+                username: user.username,
               },
-            });
-            pubsub.publish(NEW_DIRECT_MESSAGE, {
-              channelId: args.channelId,
-              newChannelMessage: {
-                ...message.dataValues,
-                user: currentUser.dataValues,
-                reply: [],
-              },
-            });
-          };
-          asyncFunc();
+            },
+            reply: [],
+          });
           return true;
         } catch (err) {
           console.log(err);

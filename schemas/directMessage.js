@@ -14,6 +14,6 @@ export default `
     createDirectMessage(receiverId: Int!, message: String!, teamId: Int!): Boolean!
   }
   type Subscription {
-    newDirectMessage(teamId: Int!, userId: Int!): DirectMessage!
+    newDirectMessage(teamId: Int!, userId: Int!, senderId: Int!): DirectMessage!
   }
 `;
