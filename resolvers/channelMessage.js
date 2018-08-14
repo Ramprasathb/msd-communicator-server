@@ -1,7 +1,7 @@
-import { PubSub, withFilter } from 'graphql-subscriptions';
+import { withFilter } from 'graphql-subscriptions';
 import { requiresUserLogin } from '../authenticator';
+import pubsub from '../pubsub';
 
-const pubsub = new PubSub();
 const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
 
 export default {
@@ -29,7 +29,10 @@ export default {
       if (reply) {
         return reply;
       }
-      return models.ChannelMessageThread.findAll({ where: { messageId: id } });
+      return models.ChannelMessageThread.findAll({
+        where: { messageId: id },
+        order: [['created_at', 'ASC']],
+      });
     },
   },
   ChannelMessageThread: {
@@ -41,13 +44,31 @@ export default {
     },
   },
   Query: {
-    getMessages: requiresUserLogin.verifyAuthentication((parent, { channelId }, { models }) => {
-      const messages = models.ChannelMessage.findAll(
-        { where: { channelId }, order: [['created_at', 'ASC']] },
-        { raw: true },
-      );
-      return messages;
-    }),
+    getMessages: requiresUserLogin.verifyAuthentication(
+      async (parent, { channelId }, { models, user }) => {
+        const messages = await models.ChannelMessage.findAll(
+          { where: { channelId }, order: [['created_at', 'ASC']] },
+          { raw: true },
+        );
+        models.ChannelOpen.findOne({
+          where: {
+            channelId,
+            userId: user.id,
+          },
+        }).then((chOpenObj) => {
+          if (chOpenObj) {
+            chOpenObj.update({ opened: new Date() });
+            return;
+          }
+          models.ChannelOpen.create({
+            channelId,
+            userId: user.id,
+            opened: new Date(),
+          });
+        });
+        return messages;
+      },
+    ),
   },
   Mutation: {
     createChannelMessage: requiresUserLogin.verifyAuthentication(
@@ -60,13 +81,16 @@ export default {
                 id: user.id,
               },
             });
+            console.log({ args }, '...', currentUser.dataValues);
             pubsub.publish(NEW_CHANNEL_MESSAGE, {
               channelId: args.channelId,
               newChannelMessage: {
                 ...message.dataValues,
                 user: currentUser.dataValues,
+                reply: [],
               },
             });
+            console.log('Published ********************');
           };
           asyncFunc();
           return {

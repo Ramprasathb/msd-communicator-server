@@ -56,22 +56,16 @@ export default {
     ),
   },
   Query: {
-    ownedTeams: requiresUserLogin.verifyAuthentication((parent, args, { models, user }) => {
-      console.log('User ID for Teams as Owner : ', user.id);
-      return models.Team.findAll({ where: { owner: user.id } }, { raw: true });
-    }),
-    memberOfTeams: requiresUserLogin.verifyAuthentication((parent, args, { models, user }) => {
-      console.log('User ID for Teams as Member', user.id);
-      return models.Team.findAll(
-        {
-          include: {
-            model: models.User,
-            where: { id: user.id },
-          },
+    ownedTeams: requiresUserLogin.verifyAuthentication((parent, args, { models, user }) => models.Team.findAll({ where: { owner: user.id } }, { raw: true })),
+    memberOfTeams: requiresUserLogin.verifyAuthentication((parent, args, { models, user }) => models.Team.findAll(
+      {
+        include: {
+          model: models.User,
+          where: { id: user.id },
         },
-        { raw: true },
-      );
-    }),
+      },
+      { raw: true },
+    )),
     getTeamMembers: requiresUserLogin.verifyAuthentication(async (parent, { teamId }, { models }) => models.sequelize.query(
       'select * from users as u join members as m on m.user_id = u.id where m.team_id = ?',
       {

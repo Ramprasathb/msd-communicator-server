@@ -40,21 +40,27 @@ const appServer = new ApolloServer({
           user = newTokens.user;
         }
         if (!user) {
-          // throw new Error('Invalid auth tokens');
+          throw new Error('Invalid auth tokens');
         }
         return true;
       }
 
-      // throw new Error('Missing auth tokens!');
+      throw new Error('Missing auth tokens!');
     },
     path: '/subscriptions',
   },
-  context: ({ req }) => ({
-    models,
-    user: req.user,
-    SECRET,
-    REFRESH_SECRET,
-  }),
+  context: (obj) => {
+    if (obj.req) {
+      return {
+        models,
+        user: obj.req.user,
+        SECRET,
+        REFRESH_SECRET,
+      };
+    }
+    console.log(JSON.stringify(obj));
+    return { models };
+  },
   playground: {
     endpoint: appPath,
     settings: {
@@ -98,7 +104,7 @@ appServer.installSubscriptionHandlers(httpServer);
 
 models.sequelize.sync({ force: false }).then(() => {
   httpServer.listen(properties.APPLICATION_PORT, () => {
-    console.log(`🚀 Server ready at ${appServer.graphqlPath}`);
-    console.log(`🚀 Subscriptions ready at ${appServer.subscriptionsPath}`);
+    console.log(` Server ready at ${appServer.graphqlPath}`);
+    console.log(` Subscriptions ready at ${appServer.subscriptionsPath}`);
   });
 });

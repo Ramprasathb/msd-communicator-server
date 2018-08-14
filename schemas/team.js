@@ -30,4 +30,8 @@ export default `
         createTeam(name: String!): CreateTeamResponse!,
         addUserToTeam(email: String!, teamId: Int!) : PlainResponse!
     }
+
+    type Subscription {
+        addedTeam: Boolean!
+    }
 `;

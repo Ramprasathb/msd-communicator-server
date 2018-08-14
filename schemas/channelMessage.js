@@ -17,6 +17,6 @@ export default `
     }
 
     type Subscription {
-        newChannelMessage(channelId: Int!): Int!
+        newChannelMessage(channelId: Int!): ChannelMessage!
     }
 `;
